@@ -8,16 +8,26 @@
     <link rel="stylesheet" type="text/css" href="login.css">
 </head>
 
-<div class="row afstand"></div>
-<div class="row">
-    <div class="col-sm-4"></div>
-    <div class="col-sm-4">
-        <form name="login" action="~/Pages/accounts/login.ashx" method="post">
-            <center><p>E-Mail:<br /> <input type="text" name="inputemail" value="Voer je e-mailadres in" /></p></center>
-            <center><p>Wachtwoord:<br /> <input type="text" name="inputwachtwoord" value="Voer je wachtwoord in" /></p></center>
-            <center><p><input type="submit" name="submitlogin" value="Inloggen" /></p></center>
-        </form>
-
+<div class="achtergrond">
+    <div class="row"></div>
+    <div class="row afstand">
+        <div class="col-sm-4"></div>
+        <div class="col-sm-4">
+            <div class="logoblok"><br /><center><h1>BlackBoard</h1></center></div>
+        </div>
+        <div class="col-sm-4"></div>
     </div>
-    <div class="col-sm-4"></div>
+    <div class="row afstand">
+        <div class="col-sm-4"></div>
+        <div class="col-sm-4 inlogblok">
+            <form name="login" action="~/Pages/accounts/login.ashx" method="post">
+                <br />
+                <center><p>E-Mail:<br /> <input type="text" name="inputemail" value="" class="tekstbalk"/></p></center>
+                <center><p>Wachtwoord:<br /> <input type="password" name="inputwachtwoord" value="" class="tekstbalk"/></p></center>
+                <center><p><input type="submit" name="submitlogin" value="Inloggen" class="inlogbutton"/></p></center>
+            </form>
+
+        </div>
+        <div class="col-sm-4"></div>
+    </div>
 </div>
