@@ -1,0 +1,23 @@
+﻿@{
+    Page.Title = "Title goes here";
+    //Layout = "Your Layout Page goes here";
+}
+
+<head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="login.css">
+</head>
+
+<div class="row afstand"></div>
+<div class="row">
+    <div class="col-sm-4"></div>
+    <div class="col-sm-4">
+        <form name="login" action="~/Pages/accounts/login.ashx" method="post">
+            <center><p>E-Mail:<br /> <input type="text" name="inputemail" value="Voer je e-mailadres in" /></p></center>
+            <center><p>Wachtwoord:<br /> <input type="text" name="inputwachtwoord" value="Voer je wachtwoord in" /></p></center>
+            <center><p><input type="submit" name="submitlogin" value="Inloggen" /></p></center>
+        </form>
+
+    </div>
+    <div class="col-sm-4"></div>
+</div>
