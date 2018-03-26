@@ -1,0 +1,58 @@
+﻿@{
+    string errorMessage = "";
+    if (IsPost)
+    {
+        string ontvanger = Request.Form["ontvanger"];
+        string onderwerp = Request.Form["onderwerp"];
+        string msgbody = Request.Form["msgbody"];
+
+
+        try
+        {
+            // Initialize WebMail helper
+            WebMail.SmtpServer = "smtp.gmail.com";
+            WebMail.SmtpPort = 587;
+            WebMail.EnableSsl = true;
+            WebMail.UserName = "noreplyzwartbord@gmail.com";
+            WebMail.Password = "Blackboard123";
+
+
+            // Send email
+            WebMail.Send(to: ontvanger,
+                subject: "Blackboard: " + onderwerp,
+                body: msgbody
+            );
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
+    }
+
+<head>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link type="text/css" rel="stylesheet" href="~/materialize/materialize.css" media="screen,projection" />
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script type="text/javascript" src="~/materialize/materialize.js"></script>
+    <script type="text/javascript" src="~/Pages/mail/mail.js"></script>
+
+</head>
+    <body>
+        <form method="post">
+            <input type="text" id="ontvanger" name="ontvanger" value="ontvanger" />
+            <input type="text" id="onderwerp" name="onderwerp" value="onderwerp" />
+            <textarea name="msgbody" id="msgbody" value="bericht"></textarea>
+            <button type="submit" value="submit"></button>
+            @{ if (errorMessage != "")
+                {
+                    <p>@errorMessage</p>
+                }
+
+
+            }
+
+        </form>
+
+    </body>
+
+}
