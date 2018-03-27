@@ -1,0 +1,7 @@
+
+*.mdf
+*.ide
+Blackboard/.vs/Blackboard/v15/.suo
+Blackboard/.vs/Blackboard/v15/Server/sqlite3/storage.ide
+Blackboard/.vs/config/applicationhost.config
+*.ldf
