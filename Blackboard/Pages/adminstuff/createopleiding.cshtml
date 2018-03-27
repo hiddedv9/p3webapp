@@ -1,0 +1,27 @@
+﻿@{
+    string message = "";
+    if (IsPost)
+    {
+        if (Request["oplname"] != "")
+        {
+            
+            // moet nog code voor db tabelcreatie
+        }
+        else
+        {
+            message = "Voer iets in in de tekstbox";
+        }
+
+    }
+}
+<body>
+    @RenderPage("adminheader.cshtml")
+
+    <h3>Create opleiding</h3>
+    <form method="post">
+        <p>opleiding naam:</p>
+        <input type="text" name="oplname" /><br />
+        <button type="submit">Creëer</button>
+    </form>
+    @message
+</body>

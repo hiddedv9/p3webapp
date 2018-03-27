@@ -1,0 +1,43 @@
+﻿@using System.Linq;
+@{
+    string userName = Environment.UserName;
+    string pad = "C:\\Users\\" + userName + "\\Desktop\\P3 WEB\\Courses\\";
+    int padlengte = pad.Length;
+    string[] entries = Directory.GetFileSystemEntries("C:\\users\\"+userName+"\\Desktop\\P3 WEB\\Courses\\", "*", SearchOption.AllDirectories);
+
+
+    if (IsPost)
+    {
+        string pad2 = Request["destroyFolder"];
+        Directory.Delete(@pad2, true);
+        //moet ook nog dbspul verwijderen
+        Response.Redirect("courseoverzicht.cshtml");
+    }
+    string message = "";
+}
+
+<body>
+    @RenderPage("adminheader.cshtml")
+
+    <h3>View courses</h3>
+    <table>
+        @foreach (string ding in entries)
+        {
+            if (!ding.Remove(0, padlengte).Contains(@"\"))
+            {
+                <tr>
+                    @ding.Remove(0, padlengte)
+                </tr>
+                <tr>
+                    <form method="post">
+                        <button name="destroyFolder" type="submit" value="@ding">Vernietig!!</button>
+                    </form>
+                </tr>
+                <br />
+            }
+        }
+    </table>
+    @message
+</body>
+
+
