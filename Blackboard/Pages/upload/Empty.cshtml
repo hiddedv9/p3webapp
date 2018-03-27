@@ -1,0 +1,21 @@
+﻿@{
+    if (IsPost)
+    {
+        var file = Request.Files[0];
+        string filename = file.FileName;
+        file.SaveAs(Server.MapPath("~/UploadedFiles/") + filename);
+    }
+}
+<!DOCTYPE html>
+<html>
+<head>
+</head>
+
+<body>
+    <form method="post" enctype="multipart/form-data" name="form">
+        <input type="file" name="upload" runat="server" /><br />
+        <button type="submit">Upload</button>
+    </form>
+    <a href="~/UploadedFiles/asp.net.txt" download>klik</a>
+</body>
+</html>
