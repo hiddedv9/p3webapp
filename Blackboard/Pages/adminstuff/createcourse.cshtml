@@ -1,0 +1,30 @@
+﻿@{
+    string message = "";
+    string userName = Environment.UserName;
+    if (IsPost)
+    {
+        if (Request["coursename"]!="")
+        {
+            System.IO.Directory.CreateDirectory("C:\\Users\\" + userName + "\\Desktop\\P3 WEB\\Courses\\" + (Request["coursename"]));
+            // moet ook nog code voor db tabelcreatie
+        }
+        else
+        {
+            message = "Voer iets in in de tekstbox";
+        }
+
+    }
+}
+<body>
+    @RenderPage("adminheader.cshtml")
+
+    <h3>Create course</h3>
+    <form method="post">
+        <p>Course naam:</p>
+        <input type="text" name="coursename" /><br />
+        <button type="submit">Creëer</button>
+    </form>
+    @message
+</body>
+
+
