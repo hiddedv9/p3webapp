@@ -1,12 +1,49 @@
 ﻿
-@{
+@{//vars
+    var mode = Session["mode"];
+    mode = "Student";
+    string ontvanger, msgbody, onderwerp;
+    string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\NewDB.mdf;Integrated Security=True";
+    string provider = "System.Data.SqlClient";
+    Database db = Database.OpenConnectionString(connectionString, provider);
+    string sql;
+    dynamic result;
+
+
 
     string errorMessage = "";
+
+
+    if (mode.ToString() == "Student")
+    {
+        if (Request.QueryString["ontvanger"] != null)
+        {
+            Session["ontvanger"] = Request.QueryString["courseid"];
+        }
+        if (Request.QueryString["ontvanger"] != null)
+        {
+            Session["ontvanger"] = Request.QueryString["ontvanger"];
+        }
+    }
+
+    //ispost
     if (IsPost)
     {
-        string ontvanger = Request.Form["ontvanger"];
-        string onderwerp = Request.Form["onderwerp"];
-        string msgbody = Request.Form["msgbody"];
+        if (mode.ToString() == "Student")
+        {
+            ontvanger = Session["ontvanger"].ToString();
+        }
+        else
+        {
+            ontvanger = Request.Form["ontvanger"];
+        }
+
+        onderwerp = Request.Form["onderwerp"];
+
+        msgbody = Request.Form["msgbody"];
+
+
+
 
 
         try
@@ -32,53 +69,98 @@
     }
 }
 
-    <head>
-        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-        <link type="text/css" rel="stylesheet" href="~/materialize/materialize.css" media="screen,projection" />
-        <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-        <script type="text/javascript" src="~/materialize/materialize.js"></script>
-        <script type="text/javascript" src="~/Pages/mail/mail.js"></script>
+<head>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link type="text/css" rel="stylesheet" href="~/materialize/materialize.css" media="screen,projection" />
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script type="text/javascript" src="~/materialize/materialize.js"></script>
+    <script type="text/javascript" src="~/Pages/mail/mail.js"></script>
 
-    </head>
-    <body>
-        <div class="container">
-            <div class="col l12">
-                <div class="row">
-                    <form method="post">
-                        <div class="row">
-                            <ul id="dropdown" class="dropdown-content">
-                                <li><a href="#">Inbox<span class="badge">12</span></a></li>
-                                
-                            </ul>
-
-                            <a class="btn dropdown-button" href="#" data-activates="dropdown">
-                                Kies Ontvanger
-                                <i class="mdi-navigation-arrow-drop-down right"></i>
-                            </a>
-                            <div class="input-field col s6">
-                                <input name="onderwerp" id="onderwerp" type="text" class="validate">
-                                <label for="onderwerp">Onderwerp</label>
-                            </div>
-                        </div>
-                        <div class="input-field col s12">
-                            <textarea  name="msgbody"id="msgbody" class="materialize-textarea"></textarea>
-                            <label for="msgbody">Bericht</label>
-                        </div>
-                        <button class="btn waves-effect waves-blue" type="submit" id="Submit" name="submit">
-                            Verstuur
-                            <i class="material-icons right">send</i>
-                        </button>
-                        @{ if (errorMessage != "")
+</head>
+<body>
+    @RenderPage("Pages/layout/nav.cshtml")
+    <div class="container">
+        <div class="col l12">
+            <div class="row">
+                <form method="post">
+                    <div class="row">
+                        @{ if (mode.ToString() == "Student")
                             {
-                                <p>@errorMessage</p>
+                                sql = "SELECT * FROM course";
+                                dynamic courseresult = db.Query(sql);
+
+                                <ul id="coursedropdown" class="dropdown-content">
+
+
+
+                                    @foreach (var row in courseresult)
+                                    {
+                                        <li><a href="~/Pages/mail/newmail.cshtml?ontvanger=@row.Emailadres">@row.Emailadres</a></li>
+                                    }
+
+
+
+                                </ul>
+
+                                <a class="btn dropdown-button" href="#" data-activates="coursedropdown">
+                                    Selecteer vakleraar
+                                    <i class="mdi-navigation-arrow-drop-down right"></i>
+                                </a>
+
+                                <ul id="dropdown" class="dropdown-content">
+
+
+
+                                    @foreach (var row in result)
+                                    {
+                                        <li><a href="~/Pages/mail/newmail.cshtml?ontvanger=@row.Emailadres">@row.Emailadres</a></li>
+                                    }
+
+
+
+                                </ul>
+
+                                <a class="btn dropdown-button" href="#" data-activates="dropdown">
+                                    Contactenboek leraren.
+                                    <i class="mdi-navigation-arrow-drop-down right"></i>
+                                </a>
                             }
 
+                            else if (mode.ToString() == "Leraar")
+                            {
 
+                            }
                         }
 
-                    </form>
-                </div>
+
+
+
+
+                        <div class="input-field col s6">
+                            <input name="onderwerp" id="onderwerp" type="text" class="validate">
+                            <label for="onderwerp">Onderwerp</label>
+                        </div>
+                    </div>
+                    <div class="input-field col s12">
+                        <textarea name="msgbody" id="msgbody" class="materialize-textarea"></textarea>
+                        <label for="msgbody">Bericht</label>
+                    </div>
+                    <button class="btn waves-effect waves-blue" type="submit" id="Submit" name="submit">
+                        Verstuur
+                        <i class="material-icons right">send</i>
+                    </button>
+                    @{ if (errorMessage != "")
+                        {
+                            <p>@errorMessage</p>
+                        }
+
+
+                    }
+
+                </form>
             </div>
         </div>
-    </body>
+    </div>
+    @RenderPage("Pages/layout/footer.cshtml")
+</body>
 
