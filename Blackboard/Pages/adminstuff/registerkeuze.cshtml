@@ -1,0 +1,16 @@
+﻿@{
+    if (IsPost)
+    {
+        Session["keuze"] = Request["Q1"];
+        Response.Redirect("register.cshtml");
+
+    }
+}
+
+<form method="post">
+    <div>Q1: Where is the Olympics 2012 being held?</div>
+    <input type="radio" name="Q1" value="student" /> Student<br />
+    <input type="radio" name="Q1" value="leraar" /> Leraar<br />
+  
+    <input type="submit" value="Kies" />
+</form>

@@ -1,13 +1,13 @@
 ﻿
 @{//vars
     var mode = Session["mode"];
-    mode = "Student";
+    mode = "Leraar";
     string ontvanger, msgbody, onderwerp;
-    string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\NewDB.mdf;Integrated Security=True";
+    string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Blackboard.mdf;Integrated Security=True";
     string provider = "System.Data.SqlClient";
     Database db = Database.OpenConnectionString(connectionString, provider);
     string sql;
-    dynamic result;
+    dynamic result = "";
 
 
 
@@ -16,13 +16,40 @@
 
     if (mode.ToString() == "Student")
     {
-        if (Request.QueryString["ontvanger"] != null)
+        if (Request.QueryString["course"] != null)
         {
-            Session["ontvanger"] = Request.QueryString["courseid"];
+            int courseid = Request.QueryString["course"].AsInt();
+            sql = "Select * FROM leraar INNER JOIN leraar_course ON leraar.leraarid = leraar_course.leraarid WHERE leraar_course.courseid=@0";
+            result = db.Query(sql, courseid);
         }
         if (Request.QueryString["ontvanger"] != null)
         {
             Session["ontvanger"] = Request.QueryString["ontvanger"];
+        }
+    }
+    else if (mode.ToString() == "Leraar")
+    {
+        if (Request.QueryString["course"] != null)
+        {
+            int courseid = Request.QueryString["course"].AsInt();
+            sql = "SELECT * FROM student INNER JOIN krijgt_cijfer ON student.studentid = krijgt_cijfer.studentid WHERE krijgt_cijfer.courseid = @0";
+            result = db.Query(sql, courseid);
+        }
+        if (Request.QueryString["ontvanger"] != null)
+        {
+            if(Request.QueryString["ontvanger"] == "all")
+            {
+                string to = "";
+                foreach(var row in result)
+                {
+                    to += row.emailadres + ';';
+                }
+                <h1>EMAILS:@to</h1>
+            }
+            else
+            {
+
+            }
         }
     }
 
@@ -78,7 +105,7 @@
 
 </head>
 <body>
-    @RenderPage("Pages/layout/nav.cshtml")
+
     <div class="container">
         <div class="col l12">
             <div class="row">
@@ -89,45 +116,113 @@
                                 sql = "SELECT * FROM course";
                                 dynamic courseresult = db.Query(sql);
 
-                                <ul id="coursedropdown" class="dropdown-content">
+
+                                if (Request.QueryString["course"] == null) // als er nog geen course gekozen is
+                                {
+                                    <h4>Selecteer de course waarover je een vraag hebt uit het drop-down menu.</h4>
+                                    <ul id="coursedropdown" class="dropdown-content">
 
 
 
-                                    @foreach (var row in courseresult)
-                                    {
-                                        <li><a href="~/Pages/mail/newmail.cshtml?ontvanger=@row.Emailadres">@row.Emailadres</a></li>
-                                    }
+                                        @foreach (var row in courseresult)
+                                        {
+                                            <li><a href="@Request.Url?course=@row.courseid">@row.naam</a></li>
+                                        }
 
 
 
-                                </ul>
+                                    </ul>
 
-                                <a class="btn dropdown-button" href="#" data-activates="coursedropdown">
-                                    Selecteer vakleraar
-                                    <i class="mdi-navigation-arrow-drop-down right"></i>
-                                </a>
-
-                                <ul id="dropdown" class="dropdown-content">
-
-
-
-                                    @foreach (var row in result)
-                                    {
-                                        <li><a href="~/Pages/mail/newmail.cshtml?ontvanger=@row.Emailadres">@row.Emailadres</a></li>
-                                    }
+                                    <a class="btn dropdown-button" href="#" data-activates="coursedropdown">
+                                        Course
+                                        <i class="mdi-navigation-arrow-drop-down right"></i>
+                                    </a>
+                                }
+                                else if (Request.QueryString["ontvanger"] == null) // als er nog geen leraar bij de gekozen course uitgekozen is
+                                {
+                                    <h4>Selecteer de leraar aan wie je wilt mailen van de course @Request.QueryString["course"] uit het drop-down menu.</h4>
+                                    <ul id="dropdown" class="dropdown-content">
 
 
 
-                                </ul>
+                                        @foreach (var row in result)
+                                        {
+                                            <li><a href="@Request.Url&ontvanger=@row.Emailadres">@row.voornaam</a></li>
+                                        }
 
-                                <a class="btn dropdown-button" href="#" data-activates="dropdown">
-                                    Contactenboek leraren.
-                                    <i class="mdi-navigation-arrow-drop-down right"></i>
-                                </a>
+                                        
+
+                                    </ul>
+
+                                    <a class="btn dropdown-button" href="#" data-activates="dropdown">
+                                        Leraar
+                                        <i class="mdi-navigation-arrow-drop-down right"></i>
+                                    </a>
+                                }
+                                else // is alles ingevuld.
+                                {
+                                    <h4>Voer een onderwerp en bericht in, en klik op Verstuur om te versturen!</h4>
+                                }
+
+
                             }
 
                             else if (mode.ToString() == "Leraar")
                             {
+                                sql = "SELECT * FROM course";
+                                dynamic courseresult = db.Query(sql);
+
+                                if (Request.QueryString["course"] == null) // als er nog geen course gekozen is
+                                {
+                                    <h4>Selecteer de course waar je een announcement voor wilt doen.</h4>
+                                    <ul id="coursedropdown" class="dropdown-content">
+
+
+
+                                        @foreach (var row in courseresult)
+                                        {
+                                            <li><a href="@Request.Url?course=@row.courseid">@row.naam</a></li>
+                                        }
+
+
+
+                                    </ul>
+
+                                    <a class="btn dropdown-button" href="#" data-activates="coursedropdown">
+                                        Course
+                                        <i class="mdi-navigation-arrow-drop-down right"></i>
+                                    </a>
+                                }
+                                else if (Request.QueryString["ontvanger"] == null) // als er nog geen student bij de gekozen course uitgekozen is
+                                {
+                                    <h4>Selecteer de student(en) aan wie je wilt mailen van de course @Request.QueryString["course"] uit het drop-down menu.</h4>
+                                    <ul id="dropdown" class="dropdown-content">
+
+
+
+                                        @foreach (var row in result)
+    {
+                                    <li><a href="@Request.Url&ontvanger=@row.Emailadres">@row.voornaam</a></li>
+}
+
+                                        <li><a href="@Request.Url&ontvanger=all">Alle</a></li>
+
+                                    </ul>
+
+                                    <a class="btn dropdown-button" href="#" data-activates="dropdown">
+                                        Student
+                                        <i class="mdi-navigation-arrow-drop-down right"></i>
+                                    </a>
+                                }
+                                else // is alles ingevuld.
+                                {
+                                    <h4>Voer een onderwerp en bericht in, en klik op Verstuur om te versturen!</h4>
+                                }
+
+
+
+
+
 
                             }
                         }
@@ -161,6 +256,6 @@
             </div>
         </div>
     </div>
-    @RenderPage("Pages/layout/footer.cshtml")
+
 </body>
 

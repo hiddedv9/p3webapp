@@ -1,0 +1,142 @@
+﻿@{
+    Page.Title = "Present Planner";
+    //Layout = "Your Layout Page goes here";
+    var newmsgs = 5;
+    AppState["newmsgs"] = newmsgs;
+    string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Blackboard.mdf;Integrated Security=True";
+    string provider = "System.Data.SqlClient";
+    Database db = Database.OpenConnectionString(connectionString, provider);
+    string sql = "";
+    dynamic result;
+    string tabelnaam = Session["keuze"].ToString();
+    Validation.RequireField("voornaam", "Voornaam is vereist!");
+    Validation.RequireField("achternaam", "Achternaam is vereist!");
+    Validation.RequireField("inputemail", "Emailadres is vereist!");
+    Validation.RequireField("inputpassword", "Wachtwoord is vereist!");
+
+    if (IsPost && Validation.IsValid())
+    {
+        var voornaam = Request.Form["voornaam"];
+        string achternaam = Request.Form["achternaam"];
+        string email = Request.Form["inputemail"];
+        string passwd = Request.Form["inputpassword"];
+        //password hashing
+        string hashedpw = Crypto.HashPassword(passwd);
+        //db logica
+
+
+        switch (tabelnaam)
+        {
+            case "student":
+                string klasnaam = Request.Form["klasnaam"];
+                int opleidingid = Request["Q1"].AsInt();
+                sql = "INSERT INTO student(klasnaam,opleidingid,emailadres,voornaam,achternaam,passhash) values(@0,@1,@2,@3,@4,@5)";
+                db.Execute(sql, klasnaam, opleidingid, email, voornaam, achternaam, hashedpw);
+
+                break;
+
+            case "leraar":
+                sql = "INSERT INTO leraar(emailadres,voornaam,achternaam,passhash) values(@0,@1,@2,@3)";
+                db.Execute(sql, email, voornaam, achternaam, hashedpw);
+
+                break;
+        }
+
+
+        db.Close();
+
+
+
+
+
+
+
+
+
+
+
+    }
+
+}
+<head>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link type="text/css" rel="stylesheet" href="css/materialize.min.css" media="screen,projection" />
+    <link type="text/css" rel="stylesheet" href="~/css/home.css" />
+</head>
+<body>
+
+
+
+
+    <div class="container">
+        <form method="post" class="col s12">
+            <div class="row">
+                <div class="input-field col s6">
+                    <input id="voornaam" name="voornaam" type="text" class="validate">
+                    <label class="active" for="voornaam">Voornaam</label>
+                </div>
+
+                <div class="input-field col s6">
+                    <input id="achternaam" name="achternaam" type="text" class="validate">
+                    <label class="active" for="achternaam">achternaam</label>
+                </div>
+            </div>
+
+
+
+            <div class="row">
+                <div class="input-field col s12">
+                    <input id="inputemail" name="inputemail" type="email" class="validate">
+                    <label class="active" for="email">Email</label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="input-field col s12">
+                    <input id="inputpassword" name="inputpassword" type="password" class="validate">
+                    <label class="active" for="password">Password</label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="input-field col s12">
+                    <input id="klasnaam" name="klasnaam" type="text" class="validate">
+                    <label class="active" for="klasnaam">Klasnaam</label>
+                </div>
+            </div>
+            @{
+                if (tabelnaam == "student")
+                {
+                    sql = "SELECT * FROM opleiding";
+                    result = db.Query(sql);
+                    
+                        <div>Kies een opleiding</div>
+                        foreach (var row in result)
+                        {
+                            <p>@row.naam</p>
+                            <input type="radio" name="Q1" value="@row.opleidingid" />
+                        }
+
+
+
+                        
+                    
+
+
+                }
+
+            }
+
+
+            <button class="btn waves-effect waves-light" type="submit" name="action">
+                Register
+                <i class="material-icons right">send</i>
+            </button>
+
+            @Html.ValidationSummary()
+        </form>
+    </div>
+
+
+
+</body>
+
+
