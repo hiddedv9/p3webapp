@@ -1,26 +1,65 @@
 ﻿@{
-    Page.Title = "Title goes here";
+
     //Layout = "Your Layout Page goes here";
+    string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Blackboard.mdf;Integrated Security=True";
+    string provider = "System.Data.SqlClient";
+    Database db = Database.OpenConnectionString(connectionString, provider);
+    string sql;
+    string passhash = "";
+
+
+
+    if (IsPost)
+    {
+        string email = Request.Form["inputemail"] ;
+        string passwd=Request.Form["inputwachtwoord"];
+
+        dynamic result;
+        sql = "SELECT * FROM student WHERE emailadres=@0";
+        result = db.QuerySingle(sql, email);
+        //passhash = result.passhash;
+        if (result != null /*&& Crypto.VerifyHashedPassword(passhash,passwd)*/)
+        {
+
+            Session["mode"] = "Student";
+            Session["studentid"] = result.studentid;
+        }
+        else if(db.QuerySingle("SELECT * FROM Leraar WHERE emailadres=@0",email) != null /*&& Crypto.VerifyHashedPassword(passhash, passwd)*/)
+        {
+            result = db.QuerySingle("SELECT * FROM Leraar WHERE emailadres=@0", email);
+            Session["mode"] = "Leraar";
+            Session["leraarid"] = result.leraarid;
+        }
+        else
+        {
+            <h4>ER GING IETS MIS</h4>
+        }
+
+
+    }
+
+
 }
 
+
 <head>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    
     <link rel="stylesheet" type="text/css" href="login.css">
 </head>
 
 <div class="achtergrond">
     <div class="row"></div>
     <div class="row afstand">
-        <div class="col-sm-4"></div>
-        <div class="col-sm-4">
+        <div class="col l4"></div>
+        <div class="col l4 ">
             <div class="logoblok"><br /><center><h1>BlackBoard</h1></center></div>
         </div>
-        <div class="col-sm-4"></div>
+        <div class="col l4"></div>
     </div>
-    <div class="row afstand">
-        <div class="col-sm-4"></div>
-        <div class="col-sm-4 inlogblok">
-            <form name="login" action="~/Pages/accounts/login.ashx" method="post">
+    <div class="row">
+        
+        <div class="col l4 inlogblok">
+            <form name="login"  method="post">
                 <br />
                 <center><p>E-Mail:<br /> <input type="text" name="inputemail" value="" class="tekstbalk"/></p></center>
                 <center><p>Wachtwoord:<br /> <input type="password" name="inputwachtwoord" value="" class="tekstbalk"/></p></center>
@@ -28,6 +67,6 @@
             </form>
 
         </div>
-        <div class="col-sm-4"></div>
+        <div class="col l4"></div>
     </div>
 </div>
