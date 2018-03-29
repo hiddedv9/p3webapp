@@ -1,0 +1,24 @@
+﻿    @{
+        bool ingelogd;
+        ingelogd = false;
+    }
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-beta/css/materialize.min.css">
+        <nav>
+            <div class="nav-wrapper color blue">
+
+                <ul id="nav-mobile" class="left hide-on-med-and-down color blue">
+                    <li><a href="~/Pages/home/home.cshtml"> <img src="~/images/NHL-Stenden-Hogeschool.jpeg" style="width:64px;height:64px;" /></a></li>
+                    <li><a href="~/Pages/home/home.cshtml">Home</a></li>
+                    <li><a href="~/Pages/courses/courses.cshtml">Courses</a></li>
+                    <li><a href="~/Pages/organizations/orginizations.cshtml">Organizations</a></li>
+                    <li><a href="https://idp01.nhl.nl/simplesaml/module.php/core/loginuserpass.php?AuthState=_9c18d57727112ef3e42e9d0a067b452bf7e0140f19%3Ahttps%3A%2F%2Fidp01.nhl.nl%2Fsimplesaml%2Fsaml2%2Fidp%2FSSOService.php%3Fspentityid%3Dhttps%253A%252F%252Fwww.mijnnhl.nl%252Fsimplesaml%252Fmodule.php%252Fsaml%252Fsp%252Fmetadata.php%252Fdefault-sp%26cookieTime%3D1522152090%26RelayState%3Dhttps%253A%252F%252Fwww.mijnnhl.nl%252F">MijnNHL</a></li>
+                    <li><a href="https://educator.nhl.nl/login">Educator</a></li>
+                </ul>
+                @if (ingelogd == false)
+                {<ul id="nav-mobile" class="right hide-on-med-and-down">
+                        <li><a href="~/Pages/login/login.cshtml">login</a></li>
+                        <li><a href="~/Pages/register/register.cshtml">register</a></li>
+                    </ul>}
+            </div>
+        </nav>
+
