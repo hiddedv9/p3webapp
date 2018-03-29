@@ -8,5 +8,3 @@ Blackboard/.vs/config/applicationhost.config
 Blackboard/.vs/Blackboard/v15/.suo
 *.mdf
 *.ldf
-*.mdf
-Blackboard/App_Data/Blackboard_log.ldf
