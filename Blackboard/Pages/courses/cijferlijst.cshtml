@@ -1,0 +1,78 @@
+﻿
+@RenderPage("~/Pages/template/header.cshtml")
+@{
+    if (Session["mode"] == null)
+    {
+        Response.Redirect("~/Pages/login/login.cshtml");
+    }
+    string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Blackboard.mdf;Integrated Security=True";
+    string provider = "System.Data.SqlClient";
+    var db = Database.OpenConnectionString(connectionString, provider);
+    int studentid = Convert.ToInt32(Session["studentid"]);
+    dynamic result;
+ 
+
+
+
+}
+
+
+
+
+<main>
+    @{
+
+        switch (Session["mode"].ToString())
+        {
+
+            case "Student":
+                result = db.Query("SELECT * FROM course INNER JOIN krijgt_cijfer on course.courseid = krijgt_cijfer.courseid WHERE krijgt_cijfer.studentid=@0", studentid);
+                <table style="background-color:white;" class="striped">
+                    <thead>
+                        <tr>
+                            <th>Vak </th>
+                            <th>Cijfer</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var row in result)
+                        {
+                            <tr>
+                                <td>@row.naam</td>
+                                <td>@row.cijfer</td>
+                            </tr>
+                        }
+
+                    </tbody>
+                </table>
+                break;
+            case "Leraar":
+                string coursenaam = Session["coursename"].ToString();
+                result = db.Query("SELECT * FROM course INNER JOIN krijgt_cijfer on course.courseid = krijgt_cijfer.courseid INNER JOIN student on student.studentid = krijgt_cijfer.studentid WHERE course.naam =@0 ORDER BY student.voornaam desc", coursenaam);
+                <table style="background-color:white;" class="striped">
+                    <thead>
+                        <tr>
+                            <th>Student</th>
+                            <th>Vak </th>
+                            <th>Cijfer</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var row in result)
+                        {
+                            <tr>
+                                <td>@row.voornaam</td>
+                                <td>@row.naam</td>
+                                <td>@row.cijfer</td>
+                            </tr>
+                        }
+
+                    </tbody>
+                </table>
+
+
+                break;
+        }
+    }
+</main>
+@RenderPage("~/Pages/template/Footer.cshtml")

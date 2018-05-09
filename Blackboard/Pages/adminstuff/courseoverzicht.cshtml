@@ -1,9 +1,13 @@
 ﻿@using System.Linq;
 @{
+    if (Session["mode"] == null)
+    {
+        Response.Redirect("~/Pages/login/login.cshtml");
+    }
     string userName = Environment.UserName;
     string pad = "C:\\Users\\" + userName + "\\Desktop\\P3 WEB\\Courses\\";
     int padlengte = pad.Length;
-    string[] entries = Directory.GetFileSystemEntries("C:\\users\\"+userName+"\\Desktop\\P3 WEB\\Courses\\", "*", SearchOption.AllDirectories);
+    string[] entries = Directory.GetFileSystemEntries("C:\\users\\" + userName + "\\Desktop\\P3 WEB\\Courses\\", "*", SearchOption.AllDirectories);
 
 
     if (IsPost)

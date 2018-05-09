@@ -1,35 +1,28 @@
-﻿@{
-    Page.Title = "Title goes here";
+﻿
 
-}
+@RenderPage("~/Pages/template/header.cshtml")
 
-<head>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-    <link rel="stylesheet" type="text/css" href="home.css">
-</head>
+<body>
+    <main>
+        <div class="row">
+            <div class="col-lg-4">
+                <div class="links">
 
-<div class="wrapper">
-
-    <div class="row">
-
-        <div class="col-lg-8">
-
-            <nav class="navbar navbar-default">
-                <div class="container-fluid">
-                    <div class="navbar-header">
-                        <a class="navbar-brand" href="#">Blackboard</a> 
-                    </div>
-                    <ul class="nav navbar-nav">
-                        <li class="active"><a href="#">Home</a></li>
-                        <li><a href="login.cshtml">Login</a></li>
-                        <li><a href="register.cshtml">Register</a></li>
-                        <li><a href="courses.cshtml"></a>Courses</li>
-                    </ul>
                 </div>
-            </nav>
+            </div>
+            <div class="col-lg-4">
+                <div class="midden">
+                    <h2>Welkom bij blackboard NHL Stenden</h2>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="rechts">
+
+                </div>
+            </div>
         </div>
-    </div>
 
-    
+    </main>
+</body>
+@RenderPage("~/Pages/template/Footer.cshtml")
 
-</div>

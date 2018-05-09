@@ -1,0 +1,43 @@
+﻿@{
+    if (IsPost && Request.Form["logout"] != null)
+    {
+
+        Session.Clear();
+        Response.Redirect("~/Pages/login/login.cshtml");
+    }
+}
+<head>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link type="text/css" rel="stylesheet" href="~/materialize/materialize.css" media="screen,projection" />
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script type="text/javascript" src="~/materialize/materialize.js"></script>
+</head>
+
+<nav>
+    <div class="nav-wrapper teal">
+        <ul id="nav-mobile" class="left hide-on-med-and-down">
+            <li><a class="brand-logo" href="~/Pages/home/home.cshtml"><img src="~/images/logo.png" alt="Logo" style="width:64px;height:64px;border:0;"></a></li>
+            <li><a href="~/Pages/home/home.cshtml">Home</a></li>
+            <li><a href="~/Pages/Courses/courses.cshtml">Courses</a></li>
+            <li><a href="~/Pages/Orginizations/Organizations.cshtml">Organizations</a></li>
+            <li><a href="https://www.mijnnhl.nl/">MijnNHL</a></li>
+            <li><a href="https://educator.nhl.nl/login">Educator</a></li>
+        </ul>
+        @{
+            if (Session["mode"] == null)
+            {
+                <ul class="right hide-on-med-and-down">
+                    <li><a href="~/Pages/login/login.cshtml">Log in</a></li>
+                </ul>
+            }
+            else
+            {
+                <form method="post">
+                    <ul class="right hide-on-med-and-down">
+                        <li><button class="btn teal lighten-3" name="logout" type="submit" value="logout">Uitloggen</button></li>
+                    </ul>
+                </form>
+            }
+        }
+    </div>
+</nav>

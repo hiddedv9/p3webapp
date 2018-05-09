@@ -1,0 +1,383 @@
+﻿@using WebMatrix.Data;
+@RenderPage("~/Pages/template/rubricheader.cshtml")
+@{
+    //open database
+    string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Blackboard.mdf;Integrated Security=True";
+    string provider = "System.Data.SqlClient";
+    var db = Database.OpenConnectionString(connectionString, provider);
+    //
+    string rubr = Convert.ToString(Session["rubr"]);
+    int count = 0;
+    int rijcount = 0;
+    int rest = 0;
+    string message = "";
+    //
+    List<int> rekenlijst = new List<int>();
+    int teller = rekenlijst.Count + 1;
+    int tel = 0;
+    List<int> puntenlijst = new List<int>();
+    int rowtel = 0;
+    //
+    float cijfer = 0;
+    Session["gekozenstudent"] = Request.QueryString["student"];
+    if (IsPost)
+    {
+        foreach (var row in db.Query(@"select * from rubric where rubr_naam=@0", rubr))
+        {
+            rowtel++;
+            if (row.col1 == null)
+            {
+                if (row.col10 != null)
+                {
+                    rekenlijst.Add(Convert.ToInt16(row.col10));
+                }
+                if (row.col9 != null)
+                {
+                    rekenlijst.Add(Convert.ToInt16(row.col9));
+                }
+                if (row.col8 != null)
+                {
+                    rekenlijst.Add(Convert.ToInt16(row.col8));
+                }
+                if (row.col7 != null)
+                {
+                    rekenlijst.Add(Convert.ToInt16(row.col7));
+                }
+                if (row.col6 != null)
+                {
+                    rekenlijst.Add(Convert.ToInt16(row.col6));
+                }
+                if (row.col5 != null)
+                {
+                    rekenlijst.Add(Convert.ToInt16(row.col5));
+                }
+                if (row.col4 != null)
+                {
+                    rekenlijst.Add(Convert.ToInt16(row.col4));
+                }
+                if (row.col3 != null)
+                {
+                    rekenlijst.Add(Convert.ToInt16(row.col3));
+                }
+                rekenlijst.Add(Convert.ToInt16(row.col2));
+                rekenlijst.Reverse();
+            }
+            else
+            {
+                teller++;
+                int a = teller + rekenlijst.Count; /*******/
+                for (int i = teller; i < a; i++) //wordt geaccessed
+                {
+                    if (Request[Convert.ToString(i)] == "on")
+                    {
+                        message = "ok";
+                        tel = 0;
+                        rest = i % (rekenlijst.Count + 1);
+                        if (rest == 0)
+                        {
+                            foreach (var ding in db.Query(@"select * from rubric where rubr_naam=@0 AND rij_id=0", rubr))
+                            {
+                                //
+                                //
+                                if (ding.col10 != null)
+                                {
+                                    puntenlijst.Add(rekenlijst[8]); break;
+                                }
+                                if (ding.col9 != null)
+                                {
+                                    puntenlijst.Add(rekenlijst[7]); break;
+                                }
+                                if (ding.col8 != null)
+                                {
+                                    puntenlijst.Add(rekenlijst[6]); break;
+                                }
+                                if (ding.col7 != null)
+                                {
+                                    puntenlijst.Add(rekenlijst[5]); break;
+                                }
+                                if (ding.col6 != null)
+                                {
+                                    puntenlijst.Add(rekenlijst[4]); break;
+                                }
+                                if (ding.col5 != null)
+                                {
+                                    puntenlijst.Add(rekenlijst[3]); break;
+                                }
+                                if (ding.col4 != null)
+                                {
+                                    puntenlijst.Add(rekenlijst[2]); break;
+                                }
+                                if (ding.col3 != null)
+                                {
+                                    puntenlijst.Add(rekenlijst[1]); break;
+                                }
+                                if (ding.col2 != null)
+                                {
+                                    puntenlijst.Add(rekenlijst[0]); break;
+                                }
+                                //
+                                //
+                            }
+                            tel += 2;
+                        }
+                        else if (rest == 2)
+                        {
+                            puntenlijst.Add(rekenlijst[(rest - 2)]);
+                            tel++;
+                        }
+                        else if (rest == 3)
+                        {
+                            puntenlijst.Add(rekenlijst[(rest - 2)]);
+                            tel++;
+                        }
+                        else if (rest == 4)
+                        {
+                            puntenlijst.Add(rekenlijst[(rest - 2)]);
+                            tel++;
+                        }
+                        else if (rest == 5)
+                        {
+                            puntenlijst.Add(rekenlijst[(rest - 2)]);
+                            tel++;
+                        }
+                        else if (rest == 6)
+                        {
+                            puntenlijst.Add(rekenlijst[(rest - 2)]);
+                            tel++;
+                        }
+                        else if (rest == 7)
+                        {
+                            puntenlijst.Add(rekenlijst[(rest - 2)]);
+                            tel++;
+                        }
+                        else if (rest == 8)
+                        {
+                            puntenlijst.Add(rekenlijst[(rest - 2)]);
+                            tel++;
+                        }
+                        else if (rest == 9)
+                        {
+                            puntenlijst.Add(rekenlijst[(rest - 2)]);
+                            tel++;
+                        }
+                        else if (rest == 10)
+                        {
+                            puntenlijst.Add(rekenlijst[(rest - 2)]);
+                            tel++;
+                        }
+                    }
+                    teller++;
+                }
+            }
+        }
+        // dan volgt nu de cijferberekening
+        float totpunten = rekenlijst[(rekenlijst.Count - 1)] * (rowtel - 2);
+        float behaaldepunten = 0;
+        foreach (int getal in puntenlijst)
+        {
+            behaaldepunten += getal;
+        }
+        cijfer = (((behaaldepunten / totpunten) * 9) + 1);
+        db.Execute("INSERT INTO krijgt_cijfer(studentid,courseid,cijfer) values(@0,@1,@2)",Convert.ToInt32(Session["gekozenstudent"]),Convert.ToInt32(Session["gekozencourse"]),cijfer);
+    }
+}
+<head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css">
+</head>
+<main>
+    <form method="post">
+        <table class="responsive-table">
+            @foreach (var ding in db.Query(@"select * from rubric where rubr_naam=@0", rubr))
+            {
+                count++;
+                if (ding.col1 != "ding")
+                {
+
+                    <tr>
+                        <!---->
+                        <td>
+                            <br />
+                            <p>
+                                @ding.col1
+                            </p>
+                            <br />
+                        </td>
+
+                        <!---->
+                        @if (ding.col2 != null)
+                        {
+                            count++;
+                            <td>
+                                @if (rijcount > 0)
+                                {
+                                    <p>
+                                        <input type="checkbox" name="@count" id="@count" />
+                                        <label for="@count">@ding.col2</label>
+                                    </p>
+
+                                }
+                                else
+                                {
+                                    <p>@ding.col2</p>
+
+                                }
+                            </td>
+                        }
+
+                        <!---->
+                        @if (ding.col3 != null)
+                        {
+                            count++;
+                            <td>
+                                @if (rijcount > 0)
+                                {
+                                    <p>
+                                        <input type="checkbox" name="@count" id="@count" />
+                                        <label for="@count">@ding.col3</label>
+                                    </p>
+                                }
+                                else
+                                {
+                                    <p>@ding.col3</p>
+                                }
+                            </td>
+                        }
+                        <!---->
+                        @if (ding.col4 != null)
+                        {
+                            count++;
+                            <td>
+                                @if (rijcount > 0)
+                                {
+                                    <p>
+                                        <input type="checkbox" name="@count" id="@count" />
+                                        <label for="@count">@ding.col4</label>
+                                    </p>
+                                }
+                                else
+                                {
+                                    <p>@ding.col4</p>
+                                }
+                            </td>
+                        }
+                        <!---->
+                        @if (ding.col5 != null)
+                        {
+                            count++;
+                            <td>
+                                @if (rijcount > 0)
+                                {
+                                    <p>
+                                        <input type="checkbox" name="@count" id="@count" />
+                                        <label for="@count">@ding.col5</label>
+                                    </p>
+                                }
+                                else
+                                {
+                                    <p>@ding.col5</p>
+                                }
+                            </td>
+                        }
+                        <!---->
+                        @if (ding.col6 != null)
+                        {
+                            count++;
+                            <td>
+                                @if (rijcount > 0)
+                                {
+                                    <p>
+                                        <input type="checkbox" name="@count" id="@count" />
+                                        <label for="@count">@ding.col6</label>
+                                    </p>
+                                }
+                                else
+                                {
+                                    <p>@ding.col6</p>
+                                }
+                            </td>
+                        }
+                        <!---->
+                        @if (ding.col7 != null)
+                        {
+                            count++;
+                            <td>
+                                @if (rijcount > 0)
+                                {
+                                    <p>
+                                        <input type="checkbox" name="@count" id="@count" />
+                                        <label for="@count">@ding.col7</label>
+                                    </p>
+                                }
+                                else
+                                {
+                                    <p>@ding.col7</p>
+                                }
+                            </td>
+                        }
+                        <!---->
+                        @if (ding.col8 != null)
+                        {
+                            count++;
+                            <td>
+                                @if (rijcount > 0)
+                                {
+                                    <p>
+                                        <input type="checkbox" name="@count" id="@count" />
+                                        <label for="@count">@ding.col8</label>
+                                    </p>
+                                }
+                                else
+                                {
+                                    <p>@ding.col8</p>
+                                }
+                            </td>
+                        }
+                        <!---->
+                        @if (ding.col9 != null)
+                        {
+                            count++;
+                            <td>
+                                @if (rijcount > 0)
+                                {
+                                    <p>
+                                        <input type="checkbox" name="@count" id="@count" />
+                                        <label for="@count">@ding.col9</label>
+                                    </p>
+                                }
+                                else
+                                {
+                                    <p>@ding.col9</p>
+                                }
+                            </td>
+                        }
+
+                        <!---->
+                        @if (ding.col10 != null)
+                        {
+                            count++;
+                            <td>
+                                @if (rijcount > 0)
+                                {
+                                    <p>
+                                        <input type="checkbox" name="@count" id="@count" />
+                                        <label for="@count">@ding.col10</label>
+                                    </p>
+                                }
+                                else
+                                {
+                                    <p>@ding.col10</p>
+                                }
+                            </td>
+                        }
+
+                    </tr>
+                    rijcount++;
+                }
+            }
+        </table>
+        <br />
+        <button type="submit">Bereken cijfer</button> <a href="studentkeuze.cshtml">Beoordeel nog een student</a>
+    </form>
+
+    <h3>Berekend cijfer: @cijfer</h3>
+</main>

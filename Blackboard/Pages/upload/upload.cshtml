@@ -1,21 +1,36 @@
-﻿@{
+﻿@RenderPage("~/Pages/template/header.cshtml")
+@{
+    string user = Convert.ToString(Session["mode"]);
+    string course = Convert.ToString(Session["coursename"]);
+
+    var bobo = "~/UploadedFiles/" + course;
+    if (user == "Student")
+    {
+        bobo += "/UploadedHomework/";
+    }
+    else if (user == "Leraar")
+    {
+        bobo += "/Content/";
+    }
+
     if (IsPost)
     {
         var file = Request.Files[0];
         string filename = file.FileName;
-        file.SaveAs(Server.MapPath("~/UploadedFiles/") + filename);
+        file.SaveAs(Server.MapPath(bobo) + filename);
     }
 }
-<!DOCTYPE html>
-<html>
-<head>
-</head>
+
 
 <body>
-    <form method="post" enctype="multipart/form-data" name="form">
-        <input type="file" name="upload" runat="server" /><br />
-        <button type="submit">Upload</button>
-    </form>
-    <a href="~/UploadedFiles/asp.net.txt" download>klik</a>
+    <main>
+        <div class="container test">
+            <form method="post" enctype="multipart/form-data" name="form">
+                <input  type="file" name="upload" runat="server" /><br /><br />
+                <button class="btn" type="submit">Upload</button>
+            </form>
+            </div>  
+    </main>
 </body>
-</html>
+   
+    @RenderPage("~/Pages/template/Footer.cshtml")

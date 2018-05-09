@@ -1,5 +1,6 @@
 ﻿@{
 
+
     //Layout = "Your Layout Page goes here";
     string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Blackboard.mdf;Integrated Security=True";
     string provider = "System.Data.SqlClient";
@@ -11,62 +12,125 @@
 
     if (IsPost)
     {
-        string email = Request.Form["inputemail"] ;
-        string passwd=Request.Form["inputwachtwoord"];
+        string email = Request.Form["inputemail"];
+        string passwd = Request.Form["inputwachtwoord"];
 
         dynamic result;
         sql = "SELECT * FROM student WHERE emailadres=@0";
         result = db.QuerySingle(sql, email);
-        //passhash = result.passhash;
-        if (result != null /*&& Crypto.VerifyHashedPassword(passhash,passwd)*/)
-        {
 
-            Session["mode"] = "Student";
-            Session["studentid"] = result.studentid;
+        if (result != null)
+        {
+            passhash = result.passhash;
+            if (Crypto.VerifyHashedPassword(passhash, passwd))
+            {
+
+
+                Session["mode"] = "Student";
+                Session["voornaam"] = result.voornaam;
+                Session["achternaam"] = result.achternaam;
+                Session["studentid"] = result.studentid;
+                Session["opleidingid"] = result.opleidingid;
+                Response.Redirect("~/Pages/courseoverzichtstudent/OVERZICHT.cshtml");
+            }
         }
-        else if(db.QuerySingle("SELECT * FROM Leraar WHERE emailadres=@0",email) != null /*&& Crypto.VerifyHashedPassword(passhash, passwd)*/)
+        else if (db.QuerySingle("SELECT * FROM Leraar WHERE emailadres=@0", email) != null)
         {
             result = db.QuerySingle("SELECT * FROM Leraar WHERE emailadres=@0", email);
-            Session["mode"] = "Leraar";
-            Session["leraarid"] = result.leraarid;
+            passhash = result.passhash;
+            if (Crypto.VerifyHashedPassword(passhash, passwd))
+            {
+
+
+                result = db.QuerySingle("SELECT * FROM Leraar WHERE emailadres=@0", email);
+                Session["mode"] = "Leraar";
+                Session["voornaam"] = result.voornaam;
+                Session["achternaam"] = result.achternaam;
+                Session["leraarid"] = result.leraarid;
+                Response.Redirect("~/Pages/courseoverzichtstudent/OVERZICHT.cshtml");
+            }
+
+
         }
         else
         {
-            <h4>ER GING IETS MIS</h4>
+
         }
 
 
     }
 
 
+
 }
 
 
-<head>
-    
-    <link rel="stylesheet" type="text/css" href="login.css">
-</head>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-beta/css/materialize.min.css">
 
-<div class="achtergrond">
-    <div class="row"></div>
-    <div class="row afstand">
-        <div class="col l4"></div>
-        <div class="col l4 ">
-            <div class="logoblok"><br /><center><h1>BlackBoard</h1></center></div>
-        </div>
-        <div class="col l4"></div>
-    </div>
-    <div class="row">
-        
-        <div class="col l4 inlogblok">
-            <form name="login"  method="post">
-                <br />
-                <center><p>E-Mail:<br /> <input type="text" name="inputemail" value="" class="tekstbalk"/></p></center>
-                <center><p>Wachtwoord:<br /> <input type="password" name="inputwachtwoord" value="" class="tekstbalk"/></p></center>
-                <center><p><input type="submit" name="submitlogin" value="Inloggen" class="inlogbutton"/></p></center>
-            </form>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-beta/js/materialize.min.js"></script>
 
+
+
+
+
+<link rel="stylesheet" type="text/css" href="~/Pages/template/mystyle.css">
+@RenderPage("~/Pages/template/loginheader.cshtml")
+<body  id="Body_Login">
+
+    <main>
+
+
+
+        <div class="row" id="card_groote">
+            <div class="col s12 ">
+                <div class="card teal lighten-1">
+                    <div class="card-content white-text">
+                        <span class="card-title">Log in</span>
+                        <div class="row center-align">
+                            <div class="card medium">
+                                <form method="post" class="col s18">
+                                    <div class="row">
+                                        <div class="input-field col s18">
+                                            <input name="inputemail" id="inputemail" type="text" class="validate">
+                                            <label class="active" for="inputemail">E-mailadres</label>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="input-field col s18">
+                                            <input id="inputwachtwoord" name="inputwachtwoord" type="password" class="validate">
+                                            <label class="active" for="inputwachtwoord">Password</label>
+                                        </div>
+                                    </div>
+                                    <div class="card-action">
+
+                                        <button onclick="funk()" class="btn waves-effect waves-light teal" type="submit" name="action">
+                                            Log in
+                                            
+                                        </button>
+                                        <script>
+                                            function funk() {
+                                                var a = document.getElementById('inputemail').value;
+                                                var b = document.getElementById('inputwachtwoord').value;
+                                                if (a === "" || b === "") {
+                                                    alert("Ge bent iets vergeten in te vullen");
+                                                }
+                                            }
+                                        </script>
+
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="col l4"></div>
-    </div>
-</div>
+    </main>
+    @RenderPage("~/Pages/template/Footer.cshtml")
+
+</body>
+
+
+
+

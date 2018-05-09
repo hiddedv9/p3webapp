@@ -1,0 +1,59 @@
+﻿@using WebMatrix.Data;
+@RenderPage("~/Pages/template/rubricheader.cshtml");
+@{
+    if (Session["mode"] == null)
+    {
+        Response.Redirect("~/Pages/login/login.cshtml");
+    }
+    //open database
+    string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Blackboard.mdf;Integrated Security=True";
+    string provider = "System.Data.SqlClient";
+    var db = Database.OpenConnectionString(connectionString, provider);
+    string coursename = Convert.ToString(Session["coursename"]);
+    dynamic result = db.QuerySingle("SELECT courseid FROM course WHERE naam=@0", coursename);
+    int courseid = Convert.ToInt32(result.courseid);
+    Session["gekozencourse"] = courseid;
+    string sql = "SELECT student.studentid,student.voornaam,student.achternaam FROM student RIGHT OUTER JOIN krijgt_cijfer on krijgt_cijfer.studentid = student.studentid WHERE krijgt_cijfer.courseid=@0";
+    result = db.Query(sql, courseid);
+
+    if (IsPost)
+    {
+
+        Session["gekozenstudent"] = Request.QueryString["student"].AsInt();
+        Response.Redirect($"rubricview2.cshtml?student={Session["gekozenstudent"]}");
+    }
+}
+<!-- Compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+<!-- Compiled and minified JavaScript -->
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+<main>
+    <div class="container test">
+        @if (Request.QueryString["student"] == null)
+        {
+
+
+            <h4>Selecteer de student die u wilt beoordelen</h4>
+            <div class="dropdown">
+                <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">
+                    Selecteer student
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu">
+                    @foreach (var row in result)
+                    {
+                        <li><a class="dropdown-item" href="rubricview2.cshtml?student=@row.studentid">@row.voornaam @row.achternaam</a></li>
+                    }
+                </ul>
+            </div>
+
+
+
+        }
+    </div>
+</main>
+@RenderPage("~/Pages/template/Footer.cshtml")

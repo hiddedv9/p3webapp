@@ -1,0 +1,93 @@
+﻿
+@RenderPage("~/Pages/template/loginheader.cshtml")
+@{
+
+    //Layout = "Your Layout Page goes here";
+    string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Blackboard.mdf;Integrated Security=True";
+    string provider = "System.Data.SqlClient";
+    Database db = Database.OpenConnectionString(connectionString, provider);
+    string sql;
+    string passhash = "";
+
+
+
+    if (IsPost)
+    {
+        string email = Request.Form["inputemail"];
+        string passwd = Request.Form["inputwachtwoord"];
+
+        dynamic result;
+        sql = "SELECT * FROM student WHERE emailadres=@0";
+        result = db.QuerySingle(sql, email);
+
+        if (result != null)
+        {
+            passhash = result.passhash;
+            if (Crypto.VerifyHashedPassword(passhash, passwd))
+            {
+
+
+                Session["mode"] = "Student";
+                Session["voornaam"] = result.voornaam;
+                Session["achternaam"] = result.achternaam;
+                Session["studentid"] = result.studentid;
+                Session["opleidingid"] = result.opleidingid;
+                Response.Redirect("~/Pages/courseoverzichtstudent/OVERZICHT.cshtml");
+            }
+        }
+        else if (db.QuerySingle("SELECT * FROM Leraar WHERE emailadres=@0", email) != null)
+        {
+            result = db.QuerySingle("SELECT * FROM Leraar WHERE emailadres=@0", email);
+            passhash = result.passhash;
+            if (Crypto.VerifyHashedPassword(passhash, passwd))
+            {
+
+
+                result = db.QuerySingle("SELECT * FROM Leraar WHERE emailadres=@0", email);
+                Session["mode"] = "Leraar";
+                Session["voornaam"] = result.voornaam;
+                Session["achternaam"] = result.achternaam;
+                Session["leraarid"] = result.leraarid;
+                Response.Redirect("~/Pages/courseoverzichtstudent/OVERZICHT.cshtml");
+            }
+
+
+        }
+        else
+        {
+            <h4>ER GING IETS MIS</h4>
+        }
+
+
+    }
+
+
+}
+
+<head>
+
+    <link rel="stylesheet" type="text/css" href="login.css">
+</head>
+<div class="container">
+
+
+
+    <div class="col l12 ">
+        <div class="row"><img class="responsive-img" src="~/images/blackboard-banner.jpg" /></div>
+    </div>
+    <div class="col l4"></div>
+
+    <div class="col l12">
+
+        <div class="row">
+            <form name="login" method="post">
+                <br />
+                <p>E-Mail:<br /> <input type="text" name="inputemail" value="" class="tekstbalk" /></p>
+                <p>Wachtwoord:<br /> <input type="password" name="inputwachtwoord" value="" class="tekstbalk" /></p>
+                <p><input type="submit" name="submitlogin" value="Inloggen" class="inlogbutton" /></p>
+            </form>
+        </div>
+
+    </div>
+</div>
+@RenderPage("~/Pages/template/Footer.cshtml");

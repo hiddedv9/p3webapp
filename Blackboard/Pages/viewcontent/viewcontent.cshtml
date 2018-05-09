@@ -1,0 +1,36 @@
+﻿@RenderPage("~/Pages/template/header.cshtml")
+@{
+    string course = Convert.ToString(Session["coursename"]);
+    string mode = Convert.ToString(Session["mode"]);
+    string pad = "C:\\Users\\Hidde\\Documents\\GitHub\\p3webapp\\Blackboard\\UploadedFiles\\" + course + "\\Content\\";
+    int padlengte = pad.Length;
+    string[] entries = Directory.GetFileSystemEntries(pad, "*", SearchOption.AllDirectories);
+    string filenaam;
+
+    if (IsPost)
+    {
+        string a = Request["button"];
+        pad += a;
+        File.Delete(pad);
+        Response.Redirect("viewcontent.cshtml");
+    }
+}
+<main>
+    <div class="container test">
+        @foreach (string ding in entries)
+        {
+            filenaam = ding.Remove(0, padlengte);
+            <a href="~/UploadedFiles/@course/Content/@filenaam" download>@filenaam</a>
+            if (mode == "Leraar")
+            {
+                <form method="post">
+                    <button class="btn" name="button" value="@filenaam">Verwijder bestand</button>
+                </form>
+            }
+
+
+            <br />
+        }
+        </div>
+</main>
+@RenderPage("~/Pages/template/Footer.cshtml")

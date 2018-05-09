@@ -1,0 +1,42 @@
+﻿body {
+    background-image: url("/images/background.jpg");
+    background-repeat: no-repeat;
+    background-size: cover;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1 0 auto;
+}
+footer{
+    background-color:red;
+}
+
+#card_groote {
+    height: 300px;
+    width: 300px;
+
+}
+.midden {
+    margin: 15px;
+    display: flex;
+    border-radius: 25px;
+    padding: 20px;
+    width: auto;
+    height: auto;
+    background-color: white;
+    box-shadow: 5px 10px 50px grey;
+}
+.test {
+    margin: auto;
+    position:center;
+    border-radius: 25px;
+    padding: 20px;
+    width: auto;
+    height: auto;
+    background-color: white;
+    box-shadow: 5px 10px 50px grey;
+    margin-top:60px;
+}
+

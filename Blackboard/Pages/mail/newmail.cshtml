@@ -1,21 +1,30 @@
-﻿
+﻿@RenderPage("~/Pages/template/header.cshtml")
 @{//vars
+    if (Session["mode"] == null)
+    {
+        Response.Redirect("~/Pages/login/login.cshtml");
+    }
     var mode = Session["mode"];
     mode = "Leraar";
-    string ontvanger, msgbody, onderwerp;
+    int studentid = 0;
+
+    string ontvanger = "", msgbody = "", onderwerp = "";
     string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Blackboard.mdf;Integrated Security=True";
     string provider = "System.Data.SqlClient";
     Database db = Database.OpenConnectionString(connectionString, provider);
     string sql;
     dynamic result = "";
-
-
+    if (Session["studentid"] != null)
+    {
+        studentid = Convert.ToInt32(Session["studentid"]);
+    }
 
     string errorMessage = "";
 
 
     if (mode.ToString() == "Student")
     {
+
         if (Request.QueryString["course"] != null)
         {
             int courseid = Request.QueryString["course"].AsInt();
@@ -37,18 +46,20 @@
         }
         if (Request.QueryString["ontvanger"] != null)
         {
-            if(Request.QueryString["ontvanger"] == "all")
+            if (Request.QueryString["ontvanger"] == "all")
             {
-                string to = "";
-                foreach(var row in result)
+
+                foreach (var row in result)
                 {
-                    to += row.emailadres + ';';
+                    ontvanger += row.emailadres + ',';
                 }
-                <h1>EMAILS:@to</h1>
+                ontvanger = ontvanger.Remove(ontvanger.Length - 1);
+                <h1>EMAILS:@ontvanger.ToString()</h1>
+                Session["ontvanger"] = ontvanger;
             }
             else
             {
-
+                Session["ontvanger"] = Request.QueryString["ontvanger"];
             }
         }
     }
@@ -56,14 +67,9 @@
     //ispost
     if (IsPost)
     {
-        if (mode.ToString() == "Student")
-        {
-            ontvanger = Session["ontvanger"].ToString();
-        }
-        else
-        {
-            ontvanger = Request.Form["ontvanger"];
-        }
+
+        ontvanger = Session["ontvanger"].ToString();
+
 
         onderwerp = Request.Form["onderwerp"];
 
@@ -96,25 +102,18 @@
     }
 }
 
-<head>
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <link type="text/css" rel="stylesheet" href="~/materialize/materialize.css" media="screen,projection" />
-    <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-    <script type="text/javascript" src="~/materialize/materialize.js"></script>
-    <script type="text/javascript" src="~/Pages/mail/mail.js"></script>
-
-</head>
+<script src="~/Pages/mail/mail.js"></script>
 <body>
-
-    <div class="container">
-        <div class="col l12">
-            <div class="row">
+    <main>
+        <div class="container test">
+            <div class="col l12">
+                
                 <form method="post">
                     <div class="row">
                         @{ if (mode.ToString() == "Student")
                             {
-                                sql = "SELECT * FROM course";
-                                dynamic courseresult = db.Query(sql);
+                                sql = "SELECT * FROM course LEFT JOIN krijgt_cijfer ON course.courseid = krijgt_cijfer.courseid WHERE krijgt_cijfer.studentid=@0";
+                                dynamic courseresult = db.Query(sql, studentid);
 
 
                                 if (Request.QueryString["course"] == null) // als er nog geen course gekozen is
@@ -140,7 +139,7 @@
                                 }
                                 else if (Request.QueryString["ontvanger"] == null) // als er nog geen leraar bij de gekozen course uitgekozen is
                                 {
-                                    <h4>Selecteer de leraar aan wie je wilt mailen van de course @Request.QueryString["course"] uit het drop-down menu.</h4>
+                                    <h4>Selecteer de leraar aan wie je wilt mailen van de course @Session["coursename"].ToString() uit het drop-down menu.</h4>
                                     <ul id="dropdown" class="dropdown-content">
 
 
@@ -150,7 +149,7 @@
                                             <li><a href="@Request.Url&ontvanger=@row.Emailadres">@row.voornaam</a></li>
                                         }
 
-                                        
+
 
                                     </ul>
 
@@ -195,15 +194,17 @@
                                 }
                                 else if (Request.QueryString["ontvanger"] == null) // als er nog geen student bij de gekozen course uitgekozen is
                                 {
-                                    <h4>Selecteer de student(en) aan wie je wilt mailen van de course @Request.QueryString["course"] uit het drop-down menu.</h4>
+
+                                   
+                                    <h4>Selecteer de student(en) aan wie je wilt mailen van de course @Session["coursename"].ToString() uit het drop-down menu.</h4>
                                     <ul id="dropdown" class="dropdown-content">
 
 
 
                                         @foreach (var row in result)
-    {
-                                    <li><a href="@Request.Url&ontvanger=@row.Emailadres">@row.voornaam</a></li>
-}
+                                        {
+                                            <li><a href="@Request.Url&ontvanger=@row.Emailadres">@row.voornaam</a></li>
+                                        }
 
                                         <li><a href="@Request.Url&ontvanger=all">Alle</a></li>
 
@@ -240,7 +241,7 @@
                         <textarea name="msgbody" id="msgbody" class="materialize-textarea"></textarea>
                         <label for="msgbody">Bericht</label>
                     </div>
-                    <button class="btn waves-effect waves-blue" type="submit" id="Submit" name="submit">
+                    <button class="btn waves-effect waves-blue" type="submit" id="Submit" name="Submit">
                         Verstuur
                         <i class="material-icons right">send</i>
                     </button>
@@ -253,9 +254,10 @@
                     }
 
                 </form>
+
             </div>
         </div>
-    </div>
+    </main>
 
 </body>
-
+@RenderPage("~/Pages/template/Footer.cshtml")

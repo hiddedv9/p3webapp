@@ -1,0 +1,70 @@
+﻿
+@RenderPage("~/Pages/template/header.cshtml")
+@using WebMatrix.Data;
+@{
+    if (Session["mode"] == null)
+    {
+        Response.Redirect("~/Pages/login/login.cshtml");
+    }
+    //open database
+    string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Blackboard.mdf;Integrated Security=True";
+    string provider = "System.Data.SqlClient";
+    var db = Database.OpenConnectionString(connectionString, provider);
+    //
+    string mode = Convert.ToString(Session["mode"]);
+
+    var sql = "select courseid, beheerderid from course where naam=@0";
+    string courseid = "";
+    string beheerderid = "";
+    string mailadres = "";
+    foreach (var row in db.Query(sql, Session["coursename"].ToString()))
+    {
+        courseid = Convert.ToString(row.courseid);
+        beheerderid = Convert.ToString(row.beheerderid);
+    }
+
+    if (mode == "Student")
+    {
+        sql = "select emailadres from leraar where leraarid=@0";
+        foreach (var row in db.Query(sql, beheerderid))
+        {
+            mailadres = Convert.ToString(row.emailadres);
+        }
+    }
+
+
+}
+<main>
+    <div style="background-color:white;" class="container test">
+        <h3>@Session["coursename"].ToString()</h3>
+
+        @if (mode == "Student")
+        {
+            <a href="~/Pages/mail/newmail.cshtml?course=@courseid&ontvanger=@mailadres">Stuur mail</a>
+        }
+        else if (mode == "Leraar")
+        {
+            <a href="~/Pages/mail/newmail.cshtml?course=@courseid">Stuur mail</a>
+        }
+        <br />
+
+        @if (mode == "Student")
+        {
+            <a href="~/Pages/upload/upload.cshtml">Upload huiswerk</a>
+        }
+        else if (mode == "Leraar")
+        { <a href="~/Pages/courses/cijferlijst.cshtml">Bekijk behaalde cijfers</a> <br />
+            <a href="~/Pages/viewcontent/viewhomework.cshtml">Bekijk ingeleverd huiswerk</a><br />
+            <a href="~/Pages/upload/upload.cshtml">Upload content</a><br />
+            <a href="~/Pages/rubric/rubric.cshtml">Maak rubric aan.</a><br />   
+            <a href="~/Pages/rubric/rubricview.cshtml">Beoordeel student.</a>
+
+        }
+        <br />
+
+        <a href="~/Pages/viewcontent/viewcontent.cshtml">Bekijk content</a>
+        <br />
+    </div>
+</main>
+@RenderPage("~/Pages/template/Footer.cshtml")
+

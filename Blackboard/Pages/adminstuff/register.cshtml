@@ -30,14 +30,45 @@
             case "student":
                 string klasnaam = Request.Form["klasnaam"];
                 int opleidingid = Request["Q1"].AsInt();
+                //record in db maken
                 sql = "INSERT INTO student(klasnaam,opleidingid,emailadres,voornaam,achternaam,passhash) values(@0,@1,@2,@3,@4,@5)";
                 db.Execute(sql, klasnaam, opleidingid, email, voornaam, achternaam, hashedpw);
+                // aangemaakte studentid ophalen
+                sql = "SELECT studentid FROM student WHERE emailadres=@0";
+                result = db.QuerySingle(sql, email);
+                int studentid = Convert.ToInt32(result.studentid);
+                //alle courses ophalen die bij de opleiding horen
+                result = db.Query("SELECT * FROM opleiding_course WHERE opleidingid=@0", opleidingid);
+
+                //koppeltabel invullen
+                sql = "INSERT INTO krijgt_cijfer(studentid,courseid) VALUES(@0,@1)";
+                // voor elke course die er is voor de opleiding, maak een record in koppeltabel met het studentid en id van die course
+                foreach (var row in result)
+                {
+                    db.Execute(sql, studentid, row.courseid);
+                }
 
                 break;
 
             case "leraar":
+                //maak record aan voor de leraar in lerarentabel
                 sql = "INSERT INTO leraar(emailadres,voornaam,achternaam,passhash) values(@0,@1,@2,@3)";
                 db.Execute(sql, email, voornaam, achternaam, hashedpw);
+                //haal ID van aangemaakte leraar op
+                sql = "SELECT leraarid FROM leraar WHERE emailadres=@0";
+                result = db.QuerySingle(sql, email);
+                int leraarid = Convert.ToInt32(result.leraarid);
+                //haal aangevinkte checkboxes op uit form
+                string coursekeuze = Request.Form["coursekeuze"];
+                //split deze waar een comma staat en zet dit in een array.
+                string[] keuzes = coursekeuze.Split(',');
+                //voor elke keuze maak een record in koppeltabel
+                foreach(string keuze in keuzes)
+                {
+                    db.Execute("INSERT INTO leraar_course(leraarid,courseid) VALUES(@0,@1)",leraarid,keuze);
+
+                }
+
 
                 break;
         }
@@ -96,33 +127,43 @@
                     <label class="active" for="password">Password</label>
                 </div>
             </div>
-            <div class="row">
-                <div class="input-field col s12">
-                    <input id="klasnaam" name="klasnaam" type="text" class="validate">
-                    <label class="active" for="klasnaam">Klasnaam</label>
-                </div>
-            </div>
+
             @{
                 if (tabelnaam == "student")
                 {
+                    <div class="row">
+                        <div class="input-field col s12">
+                            <input id="klasnaam" name="klasnaam" type="text" class="validate">
+                            <label class="active" for="klasnaam">Klasnaam</label>
+                        </div>
+                    </div>
                     sql = "SELECT * FROM opleiding";
                     result = db.Query(sql);
-                    
-                        <div>Kies een opleiding</div>
-                        foreach (var row in result)
-                        {
-                            <p>@row.naam</p>
-                            <input type="radio" name="Q1" value="@row.opleidingid" />
-                        }
+
+                    <div>Kies een opleiding</div>
+                    foreach (var row in result)
+                    {
+                        <p>@row.naam</p>
+                        <input type="radio" name="Q1" value="@row.opleidingid" />
+                    }
 
 
-
-                        
-                    
 
 
                 }
+                else if (tabelnaam == "leraar")
+                {
+                    sql = "SELECT * FROM course";
+                    result = db.Query(sql);
 
+                    foreach (var row in result)
+                    {
+                        <p>
+                            <input name="coursekeuze" type="checkbox" id="@row.courseid" value="@row.courseid" />
+                            <label for="test5">@row.naam</label>
+                        </p>
+                    }
+                }
             }
 
 

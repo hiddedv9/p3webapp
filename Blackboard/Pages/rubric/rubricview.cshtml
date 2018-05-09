@@ -1,0 +1,30 @@
+﻿@using WebMatrix.Data;
+@RenderPage("~/Pages/template/rubricheader.cshtml")
+@{
+    //open database
+    string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Blackboard.mdf;Integrated Security=True";
+    string provider = "System.Data.SqlClient";
+    var db = Database.OpenConnectionString(connectionString, provider);
+    //
+    List<string> lijst = new List<string>();
+    foreach (var ding in db.Query("select distinct rubr_naam from rubric"))
+    {
+        lijst.Add(Convert.ToString(ding.rubr_naam));
+    }
+
+    if (IsPost)
+    {
+        Session["rubr"] = Request["button"];
+        Response.Redirect("studentkeuze.cshtml");
+    }
+}
+<main>
+    <div class="container test">
+        @foreach (string ding in lijst)
+        {
+            <form method="post">
+                <button name="button" type="submit" value="@ding">@ding</button>
+            </form>
+        }
+    </div>
+</main>

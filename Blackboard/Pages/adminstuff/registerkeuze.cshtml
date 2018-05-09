@@ -7,10 +7,19 @@
     }
 }
 
+<!-- Compiled and minified CSS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css">
 <form method="post">
-    <div>Q1: Where is the Olympics 2012 being held?</div>
-    <input type="radio" name="Q1" value="student" /> Student<br />
-    <input type="radio" name="Q1" value="leraar" /> Leraar<br />
-  
+    <div>Welk type account wilt u aanmaken?</div>
+
+    <p>
+        <input id="student" type="radio" name="Q1" value="student" />
+        <label for="student">Student</label>
+    </p>
+
+    <p>
+        <input id="leraar" type="radio" name="Q1" value="leraar" />
+        <label for="leraar">Leraar</label>
+    </p>
     <input type="submit" value="Kies" />
 </form>

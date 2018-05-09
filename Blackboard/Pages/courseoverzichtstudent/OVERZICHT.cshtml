@@ -1,0 +1,77 @@
+﻿
+@RenderPage("~/Pages/template/header.cshtml")
+@using WebMatrix.Data;
+@{
+    if (Session["mode"] == null)
+    {
+        Response.Redirect("~/Pages/login/login.cshtml");
+    }
+    //open database
+    string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Blackboard.mdf;Integrated Security=True";
+    string provider = "System.Data.SqlClient";
+    var db = Database.OpenConnectionString(connectionString, provider);
+
+
+
+    int leraarid = Convert.ToInt32(Session["leraarid"]);
+    int opleidingid = Convert.ToInt32(Session["opleidingid"]);
+    int studentid = Convert.ToInt32(Session["studentid"]);
+    string voornaam = Session["voornaam"].ToString();
+    string achternaam = Session["achternaam"].ToString();
+    string mode = Convert.ToString(Session["mode"]);
+    var sql2 = db.Query("select * from course ");
+
+    if (IsPost)
+    {
+        Session["coursename"] = Request["button"];
+
+        int courseid = Convert.ToInt32(db.QuerySingle("SELECT courseid FROM course WHERE naam=@0", Request["button"]).courseid);
+        Session["courseid"] = courseid;
+        Response.Redirect("~/Pages/courses/courses.cshtml");
+    }
+}
+<main>
+    <div style="background-color:white;" class="container test">
+        <br />
+        <h2 style="font-size:25px">Voornaam: @voornaam </h2>
+        <h2 style="font-size:25px">Achternaam: @achternaam </h2>
+        @if (Session["mode"].ToString() == "Student")
+        {
+            string sql = "SELECT naam FROM opleiding WHERE opleidingid=@0";
+            string opleiding = Convert.ToString(db.QuerySingle(sql, opleidingid).naam);
+
+            <h2 style="font-size:25px">Opleiding: @opleiding</h2>
+        }
+        <br />
+
+        @if (mode == "Student")
+        {
+            <a href="~/Pages/courses/cijferlijst.cshtml">Bekijk behaalde cijfers</a>
+            <h3>Courses:</h3>
+            foreach (var ding in db.Query(@"select courseid from opleiding_course where opleidingid=@0", opleidingid))
+            {
+                foreach (var thing in db.Query(@"select naam from course where courseid=@0", ding.courseid))
+                {
+                    <form method="post">
+                        <button class="btn" type="submit" name="button" value="@thing.naam">@thing.naam</button>
+                    </form>
+                }
+            }
+        }
+        else if (mode == "Leraar")
+        {
+            <h3>Courses:</h3>
+
+            foreach (var ding in db.Query(@"select courseid from leraar_course where leraarid=@0", leraarid))
+            {
+                foreach (var thing in db.Query(@"select naam from course where courseid=@0", ding.courseid))
+                {
+                    <form method="post">
+                        <button class="btn" type="submit" name="button" value="@thing.naam">@thing.naam</button>
+                    </form>
+                }
+            }
+        }
+    </div>
+</main>
+@RenderPage("~/Pages/template/Footer.cshtml")
